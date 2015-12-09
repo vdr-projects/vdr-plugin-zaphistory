@@ -18,7 +18,12 @@ void cZapHistoryMonitor::ChannelSwitch(const cDevice *Device, int ChannelNumber,
     // Inform history, that channel has been switched
     if (ChannelNumber > 0 && Device->IsPrimaryDevice() && LiveView )
     {
+#if APIVERSNUM >= 20301
+        LOCK_CHANNELS_READ;
+        ZapHistory.ChannelSwitch( Channels->GetByNumber (ChannelNumber) );
+#else
         ZapHistory.ChannelSwitch( Channels.GetByNumber (ChannelNumber) );
+#endif
     }
 }
 

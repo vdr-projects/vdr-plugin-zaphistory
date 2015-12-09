@@ -1,5 +1,7 @@
 VDR Plugin 'zaphistory' Revision History
 ----------------------------------------
+XXXX-XX-XX: Version 0.9.7 (Martin Schirrmacher)
+- add support for vdr-2.3.1
 
 2013-08-15: Version 0.9.6 (Martin Schirrmacher)
 - add options to set progress view - old text bar, VDRSymbols, percent

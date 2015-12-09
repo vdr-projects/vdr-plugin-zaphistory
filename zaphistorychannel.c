@@ -21,7 +21,12 @@ cZapHistoryChannel::cZapHistoryChannel() {
 
 // Getter/Setter for wrapped cChannel
 const cChannel *cZapHistoryChannel::GetChannel() {
+#if APIVERSNUM >= 20301
+    LOCK_CHANNELS_READ;
+    return Channels->GetByChannelID(channelID);
+#else
     return Channels.GetByChannelID(channelID);
+#endif
 }
 
 tChannelID cZapHistoryChannel::GetChannelID() {

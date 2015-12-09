@@ -24,13 +24,21 @@ class cZapHistory : public cConfig<cZapHistoryChannel> {
 	    cZapHistoryChannel *currentChannel;	
 	    time_t lastSwitch;
 
+#if APIVERSNUM >= 20301
+	    cZapHistoryChannel* FindChannel( const cChannel *channel );
+#else
 	    cZapHistoryChannel* FindChannel( cChannel *channel );
+#endif
 	    cZapHistorySortMode sortMode;
 
 	    void UpdateHistory( cZapHistoryChannel *zapChan);
     public:
 	    cZapHistory();
-	    void ChannelSwitch( cChannel *channel );
+#if APIVERSNUM >= 20301
+        void ChannelSwitch( const cChannel *channel );
+#else
+        void ChannelSwitch( cChannel *channel );
+#endif
 	    void ViewInterrupted();
 	    void ViewContinue();
 	    void UpdateWatchTime();

@@ -63,10 +63,17 @@ bool cMenuMyScheduleItem::Update(bool Force)
     const cChannel* channel = zapChannel->GetChannel();
 
     eTimerMatch OldTimerMatch = timerMatch;
-    cTimer* hasMatch = NULL;
 
+#if APIVERSNUM >= 20301
+    LOCK_TIMERS_READ
+    const cTimer* hasMatch = NULL;
+    if (event)
+        hasMatch = Timers->GetMatch(event, &timerMatch);
+#else
+    cTimer* hasMatch = NULL;
     if (event)
         hasMatch = Timers.GetMatch(event, &timerMatch);
+#endif
 
     if (Force || timerMatch != OldTimerMatch) 
     {

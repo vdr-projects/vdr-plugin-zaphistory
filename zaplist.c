@@ -13,7 +13,11 @@
 
 cZapHistory ZapHistory;
 
+#if APIVERSNUM >= 20301
+cZapHistoryChannel* cZapHistory::FindChannel(const cChannel *channel) {
+#else
 cZapHistoryChannel* cZapHistory::FindChannel(cChannel *channel) {
+#endif
     if (channel == NULL)
 	    return NULL;
 
@@ -100,8 +104,11 @@ void cZapHistory::UpdateWatchTime() {
 void cZapHistory::ViewContinue() {
     lastSwitch = time(NULL);
 }
-
+#if APIVERSNUM >= 20301
+void cZapHistory::ChannelSwitch( const cChannel *channel ) {
+#else
 void cZapHistory::ChannelSwitch( cChannel *channel ) {
+#endif
     cZapHistoryChannel *zapChan = FindChannel( channel );
 
     // Channel not in history management

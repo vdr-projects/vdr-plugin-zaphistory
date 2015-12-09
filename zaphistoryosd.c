@@ -79,6 +79,14 @@ void cMenuZappedChannels::SortInfoItem() {
 // Builds the EPG based view
 void cMenuZappedChannels::SetupEPGView() {
     // Get schedules to retrieve EPG data
+#if APIVERSNUM >= 20301
+    LOCK_SCHEDULES_READ;
+    if( Schedules == NULL ) {
+        esyslog("ZAPHISTORY: could not get schedules - switching to statistic view");
+        SetupStatisticView();
+        return;
+    }
+#else
     cSchedulesLock *schedLock = new cSchedulesLock();
     const cSchedules *schedules = cSchedules::Schedules( *schedLock );
 
@@ -88,6 +96,7 @@ void cMenuZappedChannels::SetupEPGView() {
         SetupStatisticView();
         return;
     }
+#endif
 
     // Set tab-stops for menu columns
     SetCols( 10, 6, 6, 4);
@@ -108,7 +117,9 @@ void cMenuZappedChannels::SetupEPGView() {
         // As long as history counter as not greater that maxEntry from setup
         if (ZapHistorySetup.EntryCount == 0 || historyPosition <= ZapHistorySetup.EntryCount) {
 	        // get schedule for history item
-#if VDRVERSNUM >= 10338
+#if APIVERSNUM >= 20301
+            const cSchedule *schedule = Schedules->GetSchedule( zapChannel->GetChannel() );
+#elif VDRVERSNUM >= 10338
 	        const cSchedule *schedule = schedules->GetSchedule( zapChannel->GetChannel() );
 #else
 	        const cSchedule *schedule = schedules->GetSchedule( zapChannel->GetChannelID() );
@@ -126,9 +137,10 @@ void cMenuZappedChannels::SetupEPGView() {
         historyPosition++;
     }
 
+#if APIVERSNUM < 20301    
     // release schedules
     delete schedLock;
-
+#endif
     // buttons
     SetHelp(tr("Button$Sort"), tr("Button$Statistic"),  tr("Button$Reset"), tr("Button$Info") );
 }
@@ -200,23 +212,36 @@ eOSState cMenuZappedChannels::ShowInfo() {
 
     if (channel == NULL || channel->GetChannel() == NULL)
 	    return osUnknown;
-
+#if APIVERSNUM >= 20301
+    LOCK_SCHEDULES_READ;
+#else
     // Get schedules to retrieve EPG data
     cSchedulesLock *schedLock = new cSchedulesLock();
     const cSchedules *schedules = cSchedules::Schedules( *schedLock );
+#endif
 
-#if VDRVERSNUM >= 10338
+#if APIVERSNUM >= 20301
+    const cSchedule *schedule = Schedules->GetSchedule( channel->GetChannel() );
+#elif VDRVERSNUM >= 10338
     const cSchedule *schedule = schedules->GetSchedule( channel->GetChannel() );
 #else
     const cSchedule *schedule = schedules->GetSchedule( channel->GetChannel()->GetChannelID() );
 #endif
+    
+#if APIVERSNUM < 20301
     delete schedLock;
+#endif
 
     if (schedule == NULL)
 	    return osUnknown;
 
+#if APIVERSNUM >= 20301
+    LOCK_TIMERS_READ;
+    LOCK_CHANNELS_READ;
+    return AddSubMenu( new cMenuEvent(Timers, Channels, schedule->GetEventAround(time(NULL)) ) );
+#else
     return AddSubMenu( new cMenuEvent(schedule->GetEventAround(time(NULL)) ) );
-
+#endif
 }
 
 eOSState cMenuZappedChannels::ProcessKey(eKeys Key)

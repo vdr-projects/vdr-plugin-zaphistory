@@ -73,7 +73,12 @@ cMenuSetupZapHistory::cMenuSetupZapHistory(void)
     
     // add menu items
     SetSection(tr("Zaphistory"));
+#if APIVERSNUM >= 20301
+    LOCK_CHANNELS_READ;
+    Add(new cMenuEditIntItem(tr("Number of entries"),  &ZapHistorySetup.EntryCount, 0, Channels->Count() ));
+#else
     Add(new cMenuEditIntItem(tr("Number of entries"),  &ZapHistorySetup.EntryCount, 0, Channels.Count() ));
+#endif
     Add(new cMenuEditBoolItem(tr("Hide mainmenu entry"), &ZapHistorySetup.HideMainMenu));
     Add(new cMenuEditStraItem(tr("Default view"), &ZapHistorySetup.DummyDefaultView, 2, viewStrs));
     Add(new cMenuEditStraItem(tr("Default sort"), &ZapHistorySetup.DummyDefaultSort, 3, sortStrs));    
