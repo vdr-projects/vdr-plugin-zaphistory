@@ -11,7 +11,7 @@
 #include "zaphistoryosd.h"
 #include "epg_item.h"
 
-static const char *VERSION = "0.9.6";
+static const char *VERSION = "0.9.7";
 static const char *MAINMENUENTRY = "Zapping history";
 static const char *DESCRIPTION = "History of the last zapped channels";
 
